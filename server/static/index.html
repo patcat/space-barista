@@ -8,6 +8,8 @@
     <script src="js/aframe-randomizer-components.min.js"></script>
     <script src="js/aframe-physics-system.min.js"></script>
     <script src="js/aframe-extras.min.js"></script>
+    <script src="js/aframe-event-set-component.min.js"></script>
+    <script src="js/super-hands.min.js"></script>
 
     <script>
       function randomPointOnCircle(radius, angleRad) {
@@ -55,6 +57,27 @@
             //rightHandEl.appendChild(rightHandNAF);
           //}*/
 
+           //color randomizer
+            AFRAME.registerComponent('color-randomizer', {
+              play: function() {
+                this.el.addEventListener('drag-drop', function(evt) {
+                  evt.detail.dropped.setAttribute('material', 'color', 
+                    '#'+(Math.random()*0xFFFFFF<<0).toString(16));
+                  // color randomizer credit: http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript#comment6801353_5365036
+                });
+              }
+            });
+
+          AFRAME.registerComponent('controller-loaded', {
+            init: function() {
+              console.log('INITIALISING THINGO');
+              this.el.addEventListener('model-loaded', function() {
+                this.addState('loaded');
+                console.log('MODEL THINGO LOADED');
+              });
+            }
+          });
+
         } else {
           // Get random angle
           var angleRad = Math.random()*Math.PI*2;
@@ -81,7 +104,7 @@
       room: basic;
       debug: true;
       audio: false;
-    " physics="debug: true; gravity: -9.8;">
+    " physics="debug: true;">
       <a-assets>
         <a-asset-item id="coffeemachine-obj" src="models/aliencoffeemachine.obj"></a-asset-item>
         <a-asset-item id="coffeemachine-mtl" src="models/aliencoffeemachine.mtl"></a-asset-item>
@@ -91,7 +114,12 @@
         <a-mixin id="holder" obj-model="obj: #holder-obj; mtl: #holder-mtl"></a-mixin>
         <a-asset-item id="cup-obj" src="models/cup.obj"></a-asset-item>
         <a-asset-item id="cup-mtl" src="models/cup.mtl"></a-asset-item>
-        <a-mixin id="cup" obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06"></a-mixin>
+        <!--<a-mixin id="cup" obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" hoverable clickable grabbable stretchable drag-droppable dynamic-body="shape: box;"></a-mixin>-->
+        <a-mixin id="cup" geometry="primitive: box; width: 0.14; height: 0.2; depth: 0.14" material="transparent: true; opacity: 0" hoverable grabbable stretchable drag-droppable>
+        </a-mixin>
+        <a-mixin id="cup-hovered" material="transparent: true">
+        </a-mixin>
+        <a-mixin id="cup-dragover"></a-mixin>
 
         <!-- Templates -->
 
@@ -138,20 +166,16 @@
           </a-entity>
         </script>
 
-        <script id="hand-template" type="text/html">
-          <a-entity class="hand">
-            <a-sphere></a-sphere>
-          </a-entity>
-        </script>
-
         <!-- /Templates -->
       </a-assets>
 
       <a-camera id="camera">
       </a-camera>
 
-      <a-entity id="hand-left" static-body="shape: sphere; sphereRadius: 0.02;" hand-controls="left" sphere-collider="objects: .throwable" grab></a-entity>
-      <a-entity id="hand-right" static-body="shape: sphere; sphereRadius: 0.02;" hand-controls="right" sphere-collider="objects: .throwable" grab></a-entity>
+      <a-mixin id="controller" super-hands controller-loaded sphere-collider="objects: .cup, .cube"></a-mixin>
+      <a-mixin id="controller-loaded" static-body="shape: sphere; sphereRadius: 0.02;"></a-mixin>
+      <a-entity vive-controls="hand: left" mixin="controller"></a-entity>
+      <a-entity vive-controls="hand: right" mixin="controller"></a-entity>
 
       <a-entity light="type: ambient; color: #BBB"></a-entity>
       <a-entity light="type: directional; color: #FFF; intensity: 0.8" position="-0.5 1 1"></a-entity>
@@ -167,11 +191,21 @@
       <a-entity id="holder-left" class="holder" mixin="holder" position="-0.17 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-right" class="holder" mixin="holder" position="-0.90 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-main" class="holder" mixin="holder" position="0.5 0.8 0" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
-      <a-entity id="cup-main" class="throwable" mixin="cup" position="-1.26 0.86 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-main2" class="throwable" mixin="cup" position="-1.26 0.91 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-main3" class="throwable" mixin="cup" position="-1.26 0.96 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-main4" class="throwable" mixin="cup" position="-1.26 1.01 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-right" class="throwable" mixin="cup" position="-0.89 1.08 -0.28" dynamic-body="shape: box;"></a-entity>
+      <a-entity id="cup-main" class="cup" mixin="cup" position="-1.26 0.86 -0.27">
+        <a-entity obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" position="0 -0.02 0"></a-entity>
+      </a-entity>
+      <a-entity id="cup-main2" class="cup" mixin="cup" position="-1.26 0.91 -0.27">
+        <a-entity obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" position="0 -0.02 0"></a-entity>
+      </a-entity>
+      <a-entity id="cup-main3" class="cup" mixin="cup" position="-1.26 0.96 -0.27">
+        <a-entity obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" position="0 -0.02 0"></a-entity>
+      </a-entity>
+      <a-entity id="cup-main4" class="cup" mixin="cup" position="-1.26 1.01 -0.27">
+        <a-entity obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" position="0 -0.02 0"></a-entity>
+      </a-entity>
+      <a-entity id="cup-right" class="cup" mixin="cup" position="-0.89 1.08 -0.28">
+        <a-entity obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" position="0 -0.02 0"></a-entity>
+      </a-entity>
     </a-scene>
   <body>
-</html>
+</html>s
