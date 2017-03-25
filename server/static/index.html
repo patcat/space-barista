@@ -81,7 +81,7 @@
       room: basic;
       debug: true;
       audio: false;
-    " physics="debug: true;">
+    " physics="debug: true; gravity: -9.8;">
       <a-assets>
         <a-asset-item id="coffeemachine-obj" src="models/aliencoffeemachine.obj"></a-asset-item>
         <a-asset-item id="coffeemachine-mtl" src="models/aliencoffeemachine.mtl"></a-asset-item>
@@ -150,8 +150,8 @@
       <a-camera id="camera">
       </a-camera>
 
-      <a-entity id="hand-left" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .cup;" hand-controls="left" grab></a-entity>
-      <a-entity id="hand-right" static-body="shape: sphere; sphereRadius: 0.02;" hand-controls="right" sphere-collider="objects: .cup;" grab></a-entity>
+      <a-entity id="hand-left" static-body="shape: sphere; sphereRadius: 0.02;" hand-controls="left" sphere-collider="objects: .throwable" grab></a-entity>
+      <a-entity id="hand-right" static-body="shape: sphere; sphereRadius: 0.02;" hand-controls="right" sphere-collider="objects: .throwable" grab></a-entity>
 
       <a-entity light="type: ambient; color: #BBB"></a-entity>
       <a-entity light="type: directional; color: #FFF; intensity: 0.8" position="-0.5 1 1"></a-entity>
@@ -167,11 +167,11 @@
       <a-entity id="holder-left" class="holder" mixin="holder" position="-0.17 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-right" class="holder" mixin="holder" position="-0.90 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-main" class="holder" mixin="holder" position="0.5 0.8 0" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
-      <a-entity id="cup-main" class="cup" mixin="cup" position="-1.26 0.86 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-main2" class="cup" mixin="cup" position="-1.26 0.91 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-main3" class="cup" mixin="cup" position="-1.26 0.96 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-main4" class="cup" mixin="cup" position="-1.26 1.01 -0.27" dynamic-body="shape: box;"></a-entity>
-      <a-entity id="cup-right" class="cup" mixin="cup" position="-0.89 1.08 -0.28" dynamic-body="shape: box;"></a-entity>
+      <a-entity id="cup-main" class="throwable" mixin="cup" position="-1.26 0.86 -0.27" dynamic-body="shape: box;"></a-entity>
+      <a-entity id="cup-main2" class="throwable" mixin="cup" position="-1.26 0.91 -0.27" dynamic-body="shape: box;"></a-entity>
+      <a-entity id="cup-main3" class="throwable" mixin="cup" position="-1.26 0.96 -0.27" dynamic-body="shape: box;"></a-entity>
+      <a-entity id="cup-main4" class="throwable" mixin="cup" position="-1.26 1.01 -0.27" dynamic-body="shape: box;"></a-entity>
+      <a-entity id="cup-right" class="throwable" mixin="cup" position="-0.89 1.08 -0.28" dynamic-body="shape: box;"></a-entity>
     </a-scene>
   <body>
 </html>
