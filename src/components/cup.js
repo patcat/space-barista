@@ -2,6 +2,14 @@ AFRAME.registerComponent('cup', {
   init: function () {
     var el = this.el;
 
+    console.log('Cup has arrived', el);
+
+    var c = document.createElement('a-entity');
+        c.setAttribute('scale', '0.06 0.06 0.06');
+        c.setAttribute('position', '0 -0.02 0');
+        c.setAttribute('obj-model', 'obj: #cup-obj; mtl: #cup-mtl');
+        el.appendChild(c);
+    
     el.addEventListener('grabbed', function () {
       el.setAttribute('material','color: #ff0;');
       console.log('GRABBED!');

@@ -25,29 +25,22 @@
           this.el.addEventListener('model-loaded', function() {
             console.log('What loaded? ', this);
             
-            var cupPlaceholders = document.querySelectorAll('.cup');
-
-              for (var i = 0; i < cupPlaceholders.length; i++) {
-                var c = document.createElement('a-entity');
-                c.setAttribute('scale', '0.06 0.06 0.06');
-                c.setAttribute('position', '0 -0.02 0');
-                c.setAttribute('obj-model', 'obj: #cup-obj; mtl: #cup-mtl');
-                cupPlaceholders[i].appendChild(c);
-              }
+            //sneakInCups();
           });
         }
       });
 
-      //color randomizer
-      AFRAME.registerComponent('color-randomizer', {
-        play: function() {
-          this.el.addEventListener('drag-drop', function(evt) {
-            evt.detail.dropped.setAttribute('material', 'color', 
-              '#'+(Math.random()*0xFFFFFF<<0).toString(16));
-            // color randomizer credit: http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript#comment6801353_5365036
-          });
-        }
-      });
+      function sneakInCups() {
+        var cupPlaceholders = document.querySelectorAll('.cup');
+
+          for (var i = 0; i < cupPlaceholders.length; i++) {
+            var c = document.createElement('a-entity');
+            c.setAttribute('scale', '0.06 0.06 0.06');
+            c.setAttribute('position', '0 -0.02 0');
+            c.setAttribute('obj-model', 'obj: #cup-obj; mtl: #cup-mtl');
+            cupPlaceholders[i].appendChild(c);
+          }
+      }
 
       function randomPointOnCircle(radius, angleRad) {
         x = Math.cos(angleRad)*radius;
@@ -68,6 +61,27 @@
         ]
       };
       NAF.schemas.add(avatarSchema);
+
+      var cupSchema = {
+        template: '#cup-template',
+        components: [
+          'position',
+          'rotation',
+          'cup',
+          'class',
+          'mixin',
+          'geometry',
+          'material',
+          'scale',
+          'quaternion'
+          //'hoverable',
+          //'grabbable',
+          //'stretchable',
+          //'drag-droppable',
+          //'dynamic-body'
+        ]
+      };
+      NAF.schemas.add(cupSchema);
 
       // Called by Networked-Aframe when connected to server
       function onConnect () {
@@ -94,6 +108,15 @@
             //rightHandEl.appendChild(rightHandNAF);
           //}*/
 
+          var cups = [];
+
+          for (var n = 0; n < 6; n++) {
+            cups[n] = NAF.entities.createNetworkEntity('#cup-template', '' + (0.5 * n) + ' ' + (0.86 * n) + ' -0.27', '0 0 0');
+
+            cups[n].setAttribute('cup', '');
+            cups[n].setAttribute('class', 'cup');
+            cups[n].setAttribute('mixin', 'cup');
+          }
         } else {
           // Get random angle
           var angleRad = Math.random()*Math.PI*2;
@@ -120,7 +143,7 @@
       room: basic;
       debug: true;
       audio: false;
-    " physics="debug: true;">
+    " physics>
       <a-assets>
         <a-asset-item id="coffeemachine-obj" src="models/aliencoffeemachine.obj"></a-asset-item>
         <a-asset-item id="coffeemachine-mtl" src="models/aliencoffeemachine.mtl"></a-asset-item>
@@ -142,6 +165,10 @@
         <a-mixin id="cup-dragover"></a-mixin>
 
         <!-- Templates -->
+        <script id="cup-template" type="text/html">
+          <a-entity>
+          </a-entity>
+        </script>
 
         <!-- Avatar -->
         <script id="avatar-template" type="text/html">
@@ -192,8 +219,8 @@
       <a-camera id="camera">
       </a-camera>
 
-      <a-entity vive-controls="hand: left" mixin="controller"></a-entity>
-      <a-entity vive-controls="hand: right" mixin="controller"></a-entity>
+      <a-entity hand-controls="left" mixin="controller"></a-entity>
+      <a-entity hand-controls="right" mixin="controller"></a-entity>
 
       <a-entity light="type: ambient; color: #BBB"></a-entity>
       <a-entity light="type: directional; color: #FFF; intensity: 0.8" position="-0.5 1 1"></a-entity>
@@ -206,20 +233,10 @@
       <a-entity geometry="primitive: box; height: 1; width: 1" material="color: #fff; opacity: 0;" position="-0.38 1.16 0.13" scale="1.38 0.62 0.35" static-body></a-entity>
       <a-entity geometry="primitive: box; height: 1; width: 1" material="color: #fff; opacity: 0;" position="-0.38 0.95 -0.24" scale="1.38 -0.14 0.35" static-body></a-entity>
 
-      <a-entity id="holder-left" class="holder" mixin="holder" position="-0.17 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
+      <!--<a-entity id="holder-left" class="holder" mixin="holder" position="-0.17 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-right" class="holder" mixin="holder" position="-0.90 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
-      <a-entity id="holder-main" class="holder" mixin="holder" position="0.5 0.8 0" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
-      <a-entity cup id="cup-main" class="cup" mixin="cup" position="-1.26 0.86 -0.27">
-      </a-entity>
-      <a-entity cup id="cup-main2" class="cup" mixin="cup" position="-1.26 0.91 -0.27">
-      </a-entity>
-      <a-entity cup id="cup-main3" class="cup" mixin="cup" position="-1.26 0.96 -0.27">
-      </a-entity>
-      <a-entity cup id="cup-main4" class="cup" mixin="cup" position="-1.26 1.01 -0.27">
-      </a-entity>
-      <a-entity cup id="cup-right" class="cup" mixin="cup" position="-0.89 1.08 -0.28">
-      </a-entity>
-      <a-entity obj-model="obj: #cup-obj; mtl: #cup-mtl" scale="0.06 0.06 0.06" position="0 -0.02 0" cup-loaded></a-entity>
+      <a-entity id="holder-main" class="holder" mixin="holder" position="0.5 0.8 0" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>-->
+      
     </a-scene>
   <body>
 </html>

@@ -12,5 +12,6 @@ require('./components/network');
 // Other components
 require('./components/follow-camera');
 require('./components/show-child');
+require('./components/cup');
 
 
