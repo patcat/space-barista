@@ -3,6 +3,7 @@
     <script src="js/aframe.min.js"></script>
     <script src="js/socket.io.min.js"></script>
     <script src="easyrtc/easyrtc.js"></script>
+    <script src="js/howler.min.js"></script>
     <script src="build.js"></script>
 
     <script src="js/aframe-randomizer-components.min.js"></script>
@@ -10,6 +11,8 @@
     <script src="js/aframe-physics-system.min.js"></script>
     <script src="js/aframe-event-set-component.min.js"></script>
     <script src="js/super-hands.min.js"></script>
+
+    
 
     <script>
       AFRAME.registerComponent('controller-loaded', {
@@ -165,6 +168,10 @@
         <a-mixin id="cup-hovered" material="transparent: true">
         </a-mixin>
         <a-mixin id="cup-dragover"></a-mixin>
+        
+        <audio id="audio-success" src="audio/success.wav" preload="auto"></audio>
+        <audio id="audio-fail" src="audio/fail.wav" preload="auto"></audio>
+        <audio id="audio-coffee" src="audio/coffeemachine.wav" preload="auto"></audio>
 
         <!-- Templates -->
         <script id="cup-template" type="text/html">
@@ -174,7 +181,8 @@
 
         <!-- Avatar -->
         <script id="avatar-template" type="text/html">
-          <a-entity class="avatar">
+          <a-entity class="avatar" alien
+                 sphere-collider="objects: .cup" static-body="shape: sphere; sphereRadius: 0.4;" sound="src: #audio-success; poolSize: 100">
             <a-sphere class="head"
               color="#5985ff"
               scale="0.45 0.6 0.3"
@@ -212,10 +220,12 @@
                 </a-sphere>
               </a-sphere>
             </a-entity>
+            <a-entity class="coffee-holder" position="0 0 -0.7" geometry="primitive: sphere; radius: 0.2" material="transparent: true; opacity: 0;"></a-entity>
           </a-entity>
         </script>
 
         <!-- /Templates -->
+
       </a-assets>
 
       <a-camera id="camera">
@@ -236,13 +246,15 @@
       <a-entity geometry="primitive: box; height: 1; width: 1" material="color: #fff; opacity: 0;" position="-0.38 0.95 -0.24" scale="1.38 -0.14 0.35" static-body></a-entity>
 
       <a-entity coffee-generator id="coffeegenerator" class="coffeegenerator" position="-0.17 1.30 -0.27">
-        <a-entity coffee class="coffee" geometry="primitive: cylinder; radius: 0.02; height: 0.38" material="color: #502F00" position="0 -0.09 0"></a-entity>
+        <a-entity coffee class="coffee" geometry="primitive: cylinder; radius: 0.02; height: 0.38" material="color: #502F00" position="0 -0.09 0" sound="src: #audio-coffee; poolSize: 100; volume: 1.2; autoplay: false"></a-entity>
       </a-entity>
 
       <!--<a-entity id="holder-left" class="holder" mixin="holder" position="-0.17 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-right" class="holder" mixin="holder" position="-0.90 1.30 -0.27" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>
       <a-entity id="holder-main" class="holder" mixin="holder" position="0.5 0.8 0" rotation="0 270 0" scale="0.08 0.08 0.08" static-body></a-entity>-->
       
+      <a-entity id="bgmusic" sound="src: url(audio/Main Theme Loop.wav); autoplay: true; volume: 0.5" geometry="primitive: box; width: 0.3; height: 0.3; depth: 0.1" material="color: #555;" position="-2.56 2.63 0.07" rotation="-26.54 -42.28 0">
+      </a-entity>
     </a-scene>
   <body>
 </html>

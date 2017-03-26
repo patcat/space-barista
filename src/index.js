@@ -12,6 +12,7 @@ require('./components/network');
 // Other components
 require('./components/follow-camera');
 require('./components/show-child');
+require('./components/alien');
 require('./components/cup');
 require('./components/coffee-generator');
 

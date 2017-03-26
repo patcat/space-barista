@@ -32,10 +32,15 @@ AFRAME.registerComponent('coffee', {
       console.log('I GATCHA CAUFEEEEEEEE', evt.detail);
 
       console.log(el.getAttribute('material', 'color'));
-      evt.detail.dropped.querySelector('.liquid').setAttribute('scale', '0.06 0.06 0.06');
-      evt.detail.dropped.querySelector('.liquid').setAttribute('material', 'color: #502F00; visible: true');
-      evt.detail.dropped.setAttribute('material', 'color', 
-              '#'+(Math.random()*0xFFFFFF<<0).toString(16));
+
+      var colliderObj = evt.detail.dropped.querySelector('.liquid');
+
+      if (colliderObj) {
+        colliderObj.setAttribute('scale', '0.06 0.06 0.06');
+        colliderObj.setAttribute('material', 'color: #502F00; visible: true');
+        
+        el.components.sound.playSound();
+      }
     });
   }
 });
