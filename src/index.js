@@ -13,5 +13,6 @@ require('./components/network');
 require('./components/follow-camera');
 require('./components/show-child');
 require('./components/cup');
+require('./components/coffee-generator');
 
 
