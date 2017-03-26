@@ -8,6 +8,6 @@ and
 `npm run dev`
 
 Note:
-- You will need Node.js installed on your PC
-- You'll likely need a PC... but it might work on Mac.
-- Contact me at pat@devdiner.com and I can probably get it running somewhere easier to look at.
+* You will need Node.js installed on your PC
+* You'll likely need a PC... but it might work on Mac.
+* Contact me at pat@devdiner.com and I can probably get it running somewhere easier to look at.
