@@ -1,6 +1,10 @@
 SPACE BARISTA!
 -------
 
+Programmed by: PatCat
+Music and Sound Credit: Meri Amber!
+Powered by A-Frame and networked-aframe!
+
 To run, copy this to your computer and run:
 `npm install`
 `npm run easyrtc-install`
