@@ -10,10 +10,11 @@ require('./components/network-scene');
 require('./components/network');
 
 // Other components
+require('./components/aabb-collider');
+require('./components/event-proxy');
 require('./components/follow-camera');
 require('./components/show-child');
 require('./components/alien');
 require('./components/cup');
 require('./components/coffee-generator');
-
-
+require('./components/teleporter');

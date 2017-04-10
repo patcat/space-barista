@@ -1780,7 +1780,7 @@ class NetworkConnection {
 }
 
 module.exports = NetworkConnection;
-},{"./webrtc_interfaces/WebRtcInterface":65}],54:[function(require,module,exports){
+},{"./webrtc_interfaces/WebRtcInterface":68}],54:[function(require,module,exports){
 class NetworkEntities {
 
   constructor() {
@@ -1994,6 +1994,112 @@ class Schemas {
 
 module.exports = Schemas;
 },{}],56:[function(require,module,exports){
+/* global AFRAME, THREE */
+
+/**
+ * Implement AABB collision detection for entities with a mesh.
+ * (https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box)
+ * It sets the specified state on the intersected entities.
+ *
+ * @property {string} objects - Selector of the entities to test for collision.
+ * @property {string} state - State to set on collided entities.
+ *
+ */
+AFRAME.registerComponent('aabb-collider', {
+  schema: {
+    objects: {default: ''},
+    state: {default: 'collided'}
+  },
+
+  init: function () {
+    this.els = [];
+    this.collisions = [];
+    this.elMax = new THREE.Vector3();
+    this.elMin = new THREE.Vector3();
+  },
+
+  /**
+   * Update list of entities to test for collision.
+   */
+  update: function () {
+    var data = this.data;
+    var objectEls;
+
+    // Push entities into list of els to intersect.
+    if (data.objects) {
+      objectEls = this.el.sceneEl.querySelectorAll(data.objects);
+    } else {
+      // If objects not defined, intersect with everything.
+      objectEls = this.el.sceneEl.children;
+    }
+    // Convert from NodeList to Array
+    this.els = Array.prototype.slice.call(objectEls);
+  },
+
+  tick: (function () {
+    var boundingBox = new THREE.Box3();
+    return function () {
+      var collisions = [];
+      var el = this.el;
+      var mesh = el.getObject3D('mesh');
+      var self = this;
+      // No mesh, no collisions
+      if (!mesh) { return; }
+      // Update the bounding box to account for rotations and
+      // position changes.
+      updateBoundingBox();
+      // Update collisions.
+      this.els.forEach(intersect);
+      // Emit events.
+      collisions.forEach(handleHit);
+      // No collisions.
+      if (collisions.length === 0) { self.el.emit('hit', {el: null}); }
+      // Updated the state of the elements that are not intersected anymore.
+      this.collisions.filter(function (el) {
+        return collisions.indexOf(el) === -1;
+      }).forEach(function removeState (el) {
+        el.removeState(self.data.state);
+      });
+      // Store new collisions
+      this.collisions = collisions;
+
+      // AABB collision detection
+      function intersect (el) {
+        var intersected;
+        var mesh = el.getObject3D('mesh');
+        var elMin;
+        var elMax;
+        if (!mesh) { return; }
+        boundingBox.setFromObject(mesh);
+        elMin = boundingBox.min;
+        elMax = boundingBox.max;
+        // Bounding boxes are always aligned with the world coordinate system.
+        // The collision test checks for the conditions where cubes intersect.
+        // It's an extension to 3 dimensions of this approach (with the condition negated)
+        // https://www.youtube.com/watch?v=ghqD3e37R7E
+        intersected = (self.elMin.x <= elMax.x && self.elMax.x >= elMin.x) &&
+                      (self.elMin.y <= elMax.y && self.elMax.y >= elMin.y) &&
+                      (self.elMin.z <= elMax.z && self.elMax.z >= elMin.z);
+        if (!intersected) { return; }
+        collisions.push(el);
+      }
+
+      function handleHit (hitEl) {
+        hitEl.emit('hit');
+        hitEl.addState(self.data.state);
+        self.el.emit('hit', {el: hitEl});
+      }
+
+      function updateBoundingBox () {
+        boundingBox.setFromObject(mesh);
+        self.elMin.copy(boundingBox.min);
+        self.elMax.copy(boundingBox.max);
+      }
+    };
+  })()
+});
+
+},{}],57:[function(require,module,exports){
 AFRAME.registerComponent('alien', {
   cupHolder: false,
   chosenCup: false,
@@ -2017,6 +2123,12 @@ AFRAME.registerComponent('alien', {
   play: function () {
     var alienAvatar = this,
         el = this.el;
+
+    el.addEventListener('hit', function (evt) {
+      if (evt.detail.el) {
+        console.log('HIT!', evt);
+      }
+    });
 
     el.addEventListener('collide', function (evt) {
       if (evt.detail.body.el.getAttribute('class') == 'cup') {
@@ -2059,7 +2171,7 @@ AFRAME.registerComponent('alien', {
     }
   }
 });
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 AFRAME.registerComponent('coffee-generator', {
   init: function () {
     var el = this.el;
@@ -2106,7 +2218,7 @@ AFRAME.registerComponent('coffee', {
     });
   }
 });
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 AFRAME.registerComponent('cup', {
   init: function () {
     var el = this.el;
@@ -2128,7 +2240,22 @@ AFRAME.registerComponent('cup', {
         el.appendChild(liquid);
   }
 });
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
+AFRAME.registerComponent('event-proxy', {
+  schema: {
+    listen: {default: ''},
+    target: {type: 'selector'},
+    emit: {default: ''}
+  },
+
+  update: function () {
+    var data = this.data;
+    this.el.addEventListener(data.listen, function () {
+      data.target.emit(data.emit);
+    });
+  }
+});
+},{}],61:[function(require,module,exports){
 AFRAME.registerComponent('follow-camera', {
   camera: {},
 
@@ -2151,7 +2278,7 @@ AFRAME.registerComponent('follow-camera', {
     this.camera = document.querySelector('a-camera') || document.querySelector('[camera]');
   }
 });
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 var naf = require('../NafIndex');
 
 var EasyRtcInterface = require('../webrtc_interfaces/EasyRtcInterface');
@@ -2190,7 +2317,7 @@ AFRAME.registerComponent('network-scene', {
     naf.connection.connect(this.data.app, this.data.room, this.data.audio);
   }
 });
-},{"../NafIndex":48,"../webrtc_interfaces/EasyRtcInterface":64}],61:[function(require,module,exports){
+},{"../NafIndex":48,"../webrtc_interfaces/EasyRtcInterface":67}],63:[function(require,module,exports){
 var naf = require('../NafIndex');
 var deepEqual = require('deep-equal');
 
@@ -2536,7 +2663,7 @@ AFRAME.registerComponent('network', {
     return a.selector == b.selector && a.component == b.component;
   }
 });
-},{"../NafIndex":48,"deep-equal":4}],62:[function(require,module,exports){
+},{"../NafIndex":48,"deep-equal":4}],64:[function(require,module,exports){
 AFRAME.registerComponent('show-child', {
   schema: {
     type: 'int',
@@ -2563,7 +2690,63 @@ AFRAME.registerComponent('show-child', {
     }
   }
 });
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
+AFRAME.registerComponent('teleporter', {
+  init: function () {
+    var el = this.el,
+        data = this.data,
+        camera = this.findCamera(),
+        movePlayer = this.movePlayer;
+
+    console.log('We got a teleporter!');
+
+    el.addEventListener('click', function () {
+      console.log('You want to move!');
+      var teleporterPos = el.getAttribute('position'),
+          cameraPos = camera.getAttribute('position'),
+          desiredPos;
+
+      desiredPos = teleporterPos;
+      desiredPos.y = cameraPos.y; // Keep to user height
+
+      camera.setAttribute('animation', desiredPos);
+
+      console.log(desiredPos);
+
+      movePlayer(camera, desiredPos);
+    });
+  },
+  play: function() {
+    var el = this.el;
+
+    el.addEventListener('collide', function (evt) {
+      if (evt.detail.body.el.getAttribute('class') == 'avatar') {
+        console.log('Teleporter is taken');
+
+        //el.setAttribute('material', 'opacity: 0');
+      } else {
+        console.log('Nothing colliding!', evt);
+      }
+    });
+  },
+  movePlayer: function(camera, pos) {
+    var stringPos = pos.x + ' ' + pos.y + ' ' + pos.z,
+        rand = Math.random();
+    console.log(stringPos);
+    camera.setAttribute('animation', {
+      property: 'position',
+      dur: 1000,
+      to: stringPos,
+      startEvents: 'movePlayer'+rand
+    });
+
+    camera.emit('movePlayer'+rand);
+  },
+  findCamera: function() {
+    return document.querySelector('a-camera') || document.querySelector('[camera]');
+  }
+});
+},{}],66:[function(require,module,exports){
 // Dependencies
 require('aframe-template-component');
 require('aframe-lerp-component');
@@ -2576,15 +2759,15 @@ require('./components/network-scene');
 require('./components/network');
 
 // Other components
+require('./components/aabb-collider');
+require('./components/event-proxy');
 require('./components/follow-camera');
 require('./components/show-child');
 require('./components/alien');
 require('./components/cup');
 require('./components/coffee-generator');
-
-
-
-},{"./NafIndex.js":48,"./components/alien":56,"./components/coffee-generator":57,"./components/cup":58,"./components/follow-camera":59,"./components/network":61,"./components/network-scene":60,"./components/show-child":62,"aframe-lerp-component":1,"aframe-template-component":2}],64:[function(require,module,exports){
+require('./components/teleporter');
+},{"./NafIndex.js":48,"./components/aabb-collider":56,"./components/alien":57,"./components/coffee-generator":58,"./components/cup":59,"./components/event-proxy":60,"./components/follow-camera":61,"./components/network":63,"./components/network-scene":62,"./components/show-child":64,"./components/teleporter":65,"aframe-lerp-component":1,"aframe-template-component":2}],67:[function(require,module,exports){
 var naf = require('../NafIndex');
 var WebRtcInterface = require('./WebRtcInterface');
 
@@ -2714,7 +2897,7 @@ class EasyRtcInterface extends WebRtcInterface {
 }
 
 module.exports = EasyRtcInterface;
-},{"../NafIndex":48,"./WebRtcInterface":65}],65:[function(require,module,exports){
+},{"../NafIndex":48,"./WebRtcInterface":68}],68:[function(require,module,exports){
 var NafInterface = require('../NafInterface');
 
 class WebRtcInterface extends NafInterface {
@@ -2750,4 +2933,4 @@ WebRtcInterface.CONNECTING = 'CONNECTING';
 WebRtcInterface.NOT_CONNECTED = 'NOT_CONNECTED';
 
 module.exports = WebRtcInterface;
-},{"../NafInterface":49}]},{},[63]);
+},{"../NafInterface":49}]},{},[66]);

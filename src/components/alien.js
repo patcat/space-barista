@@ -22,6 +22,12 @@ AFRAME.registerComponent('alien', {
     var alienAvatar = this,
         el = this.el;
 
+    el.addEventListener('hit', function (evt) {
+      if (evt.detail.el) {
+        console.log('HIT!', evt);
+      }
+    });
+
     el.addEventListener('collide', function (evt) {
       if (evt.detail.body.el.getAttribute('class') == 'cup') {
         if (evt.detail.body.el.querySelector('.liquid')) {

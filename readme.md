@@ -10,6 +10,8 @@ To run, copy this to your computer and run:
 `npm run easyrtc-install`
 and
 `npm run dev`
+and
+`npm start`
 
 Note:
 * You will need Node.js installed on your PC
