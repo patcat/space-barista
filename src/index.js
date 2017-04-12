@@ -13,6 +13,7 @@ require('./components/network');
 require('./components/aabb-collider');
 require('./components/event-proxy');
 require('./components/follow-camera');
+require('./components/follow-feet');
 require('./components/show-child');
 require('./components/alien');
 require('./components/cup');

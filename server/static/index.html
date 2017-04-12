@@ -88,9 +88,25 @@
       };
       NAF.schemas.add(cupSchema);
 
+    var teleporterSchema = {
+        template: '#teleporter-template',
+        components: [
+          'position',
+          'scale',
+          'class',
+          'mixin',
+          'visible',
+          {
+            selector: '.teleporter',
+            component: 'scale'
+          }
+        ]
+      };
+      NAF.schemas.add(teleporterSchema);
+
       // Called by Networked-Aframe when connected to server
       function onConnect () {
-        if (!AFRAME.utils.isMobile() && AFRAME.utils.checkHeadsetConnected()) {
+        if ((!AFRAME.utils.isMobile() && AFRAME.utils.checkHeadsetConnected()) || window.location.hash == '#barista') {
           // Get random angle
           var angleRad = 0;
 
@@ -121,6 +137,17 @@
             cups[n].setAttribute('cup', '');
             cups[n].setAttribute('class', 'cup');
             cups[n].setAttribute('mixin', 'cup');
+          }
+
+          // Generate our teleporter spots
+          var teleporterSpots = [
+            '-2 0.6 1.4',
+            '-2 0.6 3'
+          ],
+          teleporters = [];
+
+          for (var s = 0; s < teleporterSpots.length; s++) {
+            teleporters[s] = NAF.entities.createNetworkEntity('#teleporter-template', teleporterSpots[s], '0 0 0');
           }
         } else {
           // Get random angle
@@ -170,7 +197,7 @@
         <a-mixin id="cup-hovered" material="transparent: true">
         </a-mixin>
         <a-mixin id="cup-dragover"></a-mixin>
-        <a-mixin id="teleporter" geometry="primitive: cylinder; radius: 0.5; height: 1" material="color: #fff; opacity: 0.5"></a-mixin>
+        <a-mixin id="teleporter" geometry="primitive: sphere; radius: 0.5;" material="color: #fff; opacity: 0.5" sphere-collider="objects: .avatar, .head, .avatar-camera"></a-mixin>
         
         <audio id="audio-success" src="/audio/success.mp3" preload="auto"></audio>
         <audio id="audio-fail" src="/audio/fail.mp3" preload="auto"></audio>
@@ -180,6 +207,11 @@
         <!-- Templates -->
         <script id="cup-template" type="text/html">
           <a-entity>
+          </a-entity>
+        </script>
+
+        <script id="teleporter-template" type="text/html">
+          <a-entity visible="true" teleporter class="clickable teleporter" mixin="teleporter" scale="1 1 1">
           </a-entity>
         </script>
 
@@ -232,19 +264,20 @@
 
       </a-assets>
 
+      <a-entity follow-feet class="avatar-camera" position="0 0.5 0" geometry="primitive: sphere; radius: 0.25" sphere-collider="objects: .teleporter" visible="false"></a-entity>
       <a-camera id="camera" look-controls>
         <a-entity id="reticle"
-                  position="0 0 -1"
+                  position="0 0 -0.5"
                   geometry="primitive: ring;
-                    radiusOuter: 0.04;
-                    radiusInner: 0.035;
+                    radiusOuter: 0.012;
+                    radiusInner: 0.008;
                     thetaLength: 0;"
                   material="color: #D6DFFE; shader: flat"
                   raycaster="objects: .clickable"
                   cursor="fuse: true; fuseTimeout: 500">
             <a-entity geometry="primitive: ring;
-                    radiusOuter: 0.035;
-                    radiusInner: 0.03;
+                    radiusOuter: 0.008;
+                    radiusInner: 0.007;
                     thetaLength: 360;"
                   material="color: white; shader: flat">
             </a-entity>
@@ -260,9 +293,6 @@
 
       <a-entity light="type: ambient; color: #BBB"></a-entity>
       <a-entity light="type: directional; color: #FFF; intensity: 0.8" position="-0.5 1 1"></a-entity>
-
-      <a-entity teleporter mixin="teleporter" position="-2 0.6 1.4" class="clickable teleporter" kinematic-body></a-entity>
-      <a-entity teleporter mixin="teleporter" position="-2 0.6 3" class="clickable teleporter" kinematic-body></a-entity>
 
       <a-entity geometry="primitive: cylinder; radius: 64; height: 0.1" material="color: #f60" static-body></a-entity>
 

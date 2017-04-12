@@ -22,9 +22,21 @@ AFRAME.registerComponent('alien', {
     var alienAvatar = this,
         el = this.el;
 
-    el.addEventListener('hit', function (evt) {
+    /*el.addEventListener('hit', function (evt) {
       if (evt.detail.el) {
         console.log('HIT!', evt);
+      }
+    });*/
+
+    el.addEventListener('stateadded', function (evt) {
+      if (evt.detail.state) {
+        console.log('Alien State is: ', evt.detail.state);
+      }
+    });
+
+    el.addEventListener('stateremoved', function (evt) {
+      if (evt.detail.state) {
+        console.log('Alien State was: ', evt.detail.state);
       }
     });
 

@@ -1780,7 +1780,7 @@ class NetworkConnection {
 }
 
 module.exports = NetworkConnection;
-},{"./webrtc_interfaces/WebRtcInterface":68}],54:[function(require,module,exports){
+},{"./webrtc_interfaces/WebRtcInterface":69}],54:[function(require,module,exports){
 class NetworkEntities {
 
   constructor() {
@@ -2124,9 +2124,21 @@ AFRAME.registerComponent('alien', {
     var alienAvatar = this,
         el = this.el;
 
-    el.addEventListener('hit', function (evt) {
+    /*el.addEventListener('hit', function (evt) {
       if (evt.detail.el) {
         console.log('HIT!', evt);
+      }
+    });*/
+
+    el.addEventListener('stateadded', function (evt) {
+      if (evt.detail.state) {
+        console.log('Alien State is: ', evt.detail.state);
+      }
+    });
+
+    el.addEventListener('stateremoved', function (evt) {
+      if (evt.detail.state) {
+        console.log('Alien State was: ', evt.detail.state);
       }
     });
 
@@ -2279,6 +2291,28 @@ AFRAME.registerComponent('follow-camera', {
   }
 });
 },{}],62:[function(require,module,exports){
+AFRAME.registerComponent('follow-feet', {
+  camera: {},
+
+  init: function() {
+    this.findCamera();
+  },
+
+  tick: function() {
+    if (this.camera) {
+      var position = this.camera.getAttribute('position');
+      var thisPosition = this.el.getAttribute('position');
+      this.el.setAttribute('position', {x: position.x, y: thisPosition.y, z: position.z});
+    } else {
+      this.findCamera();
+    }
+  },
+
+  findCamera: function() {
+    this.camera = document.querySelector('a-camera') || document.querySelector('[camera]');
+  }
+});
+},{}],63:[function(require,module,exports){
 var naf = require('../NafIndex');
 
 var EasyRtcInterface = require('../webrtc_interfaces/EasyRtcInterface');
@@ -2317,7 +2351,7 @@ AFRAME.registerComponent('network-scene', {
     naf.connection.connect(this.data.app, this.data.room, this.data.audio);
   }
 });
-},{"../NafIndex":48,"../webrtc_interfaces/EasyRtcInterface":67}],63:[function(require,module,exports){
+},{"../NafIndex":48,"../webrtc_interfaces/EasyRtcInterface":68}],64:[function(require,module,exports){
 var naf = require('../NafIndex');
 var deepEqual = require('deep-equal');
 
@@ -2663,7 +2697,7 @@ AFRAME.registerComponent('network', {
     return a.selector == b.selector && a.component == b.component;
   }
 });
-},{"../NafIndex":48,"deep-equal":4}],64:[function(require,module,exports){
+},{"../NafIndex":48,"deep-equal":4}],65:[function(require,module,exports){
 AFRAME.registerComponent('show-child', {
   schema: {
     type: 'int',
@@ -2690,7 +2724,7 @@ AFRAME.registerComponent('show-child', {
     }
   }
 });
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 AFRAME.registerComponent('teleporter', {
   init: function () {
     var el = this.el,
@@ -2702,7 +2736,7 @@ AFRAME.registerComponent('teleporter', {
 
     el.addEventListener('click', function () {
       console.log('You want to move!');
-      var teleporterPos = el.getAttribute('position'),
+      var teleporterPos = el.parentNode.getAttribute('position'),
           cameraPos = camera.getAttribute('position'),
           desiredPos;
 
@@ -2719,7 +2753,25 @@ AFRAME.registerComponent('teleporter', {
   play: function() {
     var el = this.el;
 
-    el.addEventListener('collide', function (evt) {
+    el.addEventListener('stateadded', function (evt) {
+      if (evt.detail.state == 'collided') {
+        console.log('State is: ', evt.detail.state);
+
+        //el.setAttribute('visible','false');
+        el.setAttribute('scale','0 0 0');
+      }
+    });
+
+    el.addEventListener('stateremoved', function (evt) {
+      if (evt.detail.state == 'collided') {
+        console.log('State was: ', evt.detail.state);
+
+        //el.setAttribute('visible','true');
+        el.setAttribute('scale','1 1 1');
+      }
+    });
+
+    el.addEventListener('collided', function (evt) {
       if (evt.detail.body.el.getAttribute('class') == 'avatar') {
         console.log('Teleporter is taken');
 
@@ -2746,7 +2798,7 @@ AFRAME.registerComponent('teleporter', {
     return document.querySelector('a-camera') || document.querySelector('[camera]');
   }
 });
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 // Dependencies
 require('aframe-template-component');
 require('aframe-lerp-component');
@@ -2762,12 +2814,13 @@ require('./components/network');
 require('./components/aabb-collider');
 require('./components/event-proxy');
 require('./components/follow-camera');
+require('./components/follow-feet');
 require('./components/show-child');
 require('./components/alien');
 require('./components/cup');
 require('./components/coffee-generator');
 require('./components/teleporter');
-},{"./NafIndex.js":48,"./components/aabb-collider":56,"./components/alien":57,"./components/coffee-generator":58,"./components/cup":59,"./components/event-proxy":60,"./components/follow-camera":61,"./components/network":63,"./components/network-scene":62,"./components/show-child":64,"./components/teleporter":65,"aframe-lerp-component":1,"aframe-template-component":2}],67:[function(require,module,exports){
+},{"./NafIndex.js":48,"./components/aabb-collider":56,"./components/alien":57,"./components/coffee-generator":58,"./components/cup":59,"./components/event-proxy":60,"./components/follow-camera":61,"./components/follow-feet":62,"./components/network":64,"./components/network-scene":63,"./components/show-child":65,"./components/teleporter":66,"aframe-lerp-component":1,"aframe-template-component":2}],68:[function(require,module,exports){
 var naf = require('../NafIndex');
 var WebRtcInterface = require('./WebRtcInterface');
 
@@ -2897,7 +2950,7 @@ class EasyRtcInterface extends WebRtcInterface {
 }
 
 module.exports = EasyRtcInterface;
-},{"../NafIndex":48,"./WebRtcInterface":68}],68:[function(require,module,exports){
+},{"../NafIndex":48,"./WebRtcInterface":69}],69:[function(require,module,exports){
 var NafInterface = require('../NafInterface');
 
 class WebRtcInterface extends NafInterface {
@@ -2933,4 +2986,4 @@ WebRtcInterface.CONNECTING = 'CONNECTING';
 WebRtcInterface.NOT_CONNECTED = 'NOT_CONNECTED';
 
 module.exports = WebRtcInterface;
-},{"../NafInterface":49}]},{},[66]);
+},{"../NafInterface":49}]},{},[67]);
