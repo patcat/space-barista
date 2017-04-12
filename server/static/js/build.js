@@ -1780,7 +1780,7 @@ class NetworkConnection {
 }
 
 module.exports = NetworkConnection;
-},{"./webrtc_interfaces/WebRtcInterface":69}],54:[function(require,module,exports){
+},{"./webrtc_interfaces/WebRtcInterface":70}],54:[function(require,module,exports){
 class NetworkEntities {
 
   constructor() {
@@ -2351,7 +2351,7 @@ AFRAME.registerComponent('network-scene', {
     naf.connection.connect(this.data.app, this.data.room, this.data.audio);
   }
 });
-},{"../NafIndex":48,"../webrtc_interfaces/EasyRtcInterface":68}],64:[function(require,module,exports){
+},{"../NafIndex":48,"../webrtc_interfaces/EasyRtcInterface":69}],64:[function(require,module,exports){
 var naf = require('../NafIndex');
 var deepEqual = require('deep-equal');
 
@@ -2698,6 +2698,46 @@ AFRAME.registerComponent('network', {
   }
 });
 },{"../NafIndex":48,"deep-equal":4}],65:[function(require,module,exports){
+AFRAME.registerComponent('order-button', {
+  init: function () {
+    var el = this.el,
+        data = this.data,
+        toggle = el.querySelector('.order-button-toggle');
+
+    console.log('We got an order button!', toggle);
+  }
+});
+
+AFRAME.registerComponent('order-button-toggle', {
+  init: function () {
+    var el = this.el,
+        data = this.data,
+        buttonHolder = this.el.parentNode,
+        initialPosition = el.getAttribute('position');
+
+    if (el.getAttribute('position') == '0 0 0') {
+      el.setAttribute('pressed', true);
+    } else {
+      el.setAttribute('pressed', false);
+    }
+    
+
+    el.addEventListener('click', function () {
+      pressed = el.getAttribute('pressed');
+
+      console.log('Order button pressed: ', pressed);
+
+      if (pressed != "true" || !pressed) {
+        el.setAttribute('pressed', 'true');
+        el.setAttribute('position', '0 0 0');
+      } else {
+        el.setAttribute('pressed', 'false');
+        el.setAttribute('position', '0 ' + initialPosition.y + ' 0');
+      }
+    });
+  }
+});
+},{}],66:[function(require,module,exports){
 AFRAME.registerComponent('show-child', {
   schema: {
     type: 'int',
@@ -2724,7 +2764,7 @@ AFRAME.registerComponent('show-child', {
     }
   }
 });
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 AFRAME.registerComponent('teleporter', {
   init: function () {
     var el = this.el,
@@ -2798,7 +2838,7 @@ AFRAME.registerComponent('teleporter', {
     return document.querySelector('a-camera') || document.querySelector('[camera]');
   }
 });
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 // Dependencies
 require('aframe-template-component');
 require('aframe-lerp-component');
@@ -2820,7 +2860,8 @@ require('./components/alien');
 require('./components/cup');
 require('./components/coffee-generator');
 require('./components/teleporter');
-},{"./NafIndex.js":48,"./components/aabb-collider":56,"./components/alien":57,"./components/coffee-generator":58,"./components/cup":59,"./components/event-proxy":60,"./components/follow-camera":61,"./components/follow-feet":62,"./components/network":64,"./components/network-scene":63,"./components/show-child":65,"./components/teleporter":66,"aframe-lerp-component":1,"aframe-template-component":2}],68:[function(require,module,exports){
+require('./components/order-button');
+},{"./NafIndex.js":48,"./components/aabb-collider":56,"./components/alien":57,"./components/coffee-generator":58,"./components/cup":59,"./components/event-proxy":60,"./components/follow-camera":61,"./components/follow-feet":62,"./components/network":64,"./components/network-scene":63,"./components/order-button":65,"./components/show-child":66,"./components/teleporter":67,"aframe-lerp-component":1,"aframe-template-component":2}],69:[function(require,module,exports){
 var naf = require('../NafIndex');
 var WebRtcInterface = require('./WebRtcInterface');
 
@@ -2950,7 +2991,7 @@ class EasyRtcInterface extends WebRtcInterface {
 }
 
 module.exports = EasyRtcInterface;
-},{"../NafIndex":48,"./WebRtcInterface":69}],69:[function(require,module,exports){
+},{"../NafIndex":48,"./WebRtcInterface":70}],70:[function(require,module,exports){
 var NafInterface = require('../NafInterface');
 
 class WebRtcInterface extends NafInterface {
@@ -2986,4 +3027,4 @@ WebRtcInterface.CONNECTING = 'CONNECTING';
 WebRtcInterface.NOT_CONNECTED = 'NOT_CONNECTED';
 
 module.exports = WebRtcInterface;
-},{"../NafInterface":49}]},{},[67]);
+},{"../NafInterface":49}]},{},[68]);

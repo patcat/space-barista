@@ -19,3 +19,4 @@ require('./components/alien');
 require('./components/cup');
 require('./components/coffee-generator');
 require('./components/teleporter');
+require('./components/order-button');

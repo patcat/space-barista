@@ -88,7 +88,31 @@
       };
       NAF.schemas.add(cupSchema);
 
-    var teleporterSchema = {
+      var orderButtonSchema = {
+        template: '#order-button-template',
+        components: [
+          'position',
+          'rotation',
+          'order-button',
+          'class',
+          'mixin',
+          'geometry',
+          'material',
+          'quaternion',
+          //'hoverable',
+          //'grabbable',
+          //'stretchable',
+          //'drag-droppable',
+          //'dynamic-body',
+          {
+            selector: '.order-button-toggle',
+            component: 'position'
+          }
+        ]
+      };
+      NAF.schemas.add(orderButtonSchema);
+
+      var teleporterSchema = {
         template: '#teleporter-template',
         components: [
           'position',
@@ -137,6 +161,17 @@
             cups[n].setAttribute('cup', '');
             cups[n].setAttribute('class', 'cup');
             cups[n].setAttribute('mixin', 'cup');
+          }
+
+          var orderButtons = [];
+
+          for (var o = 0; o < 6; o++) {
+            orderButtons[o] = NAF.entities.createNetworkEntity('#order-button-template', '' + (-2.75 + o*0.3) + ' ' + 0.83 + ' 0.40', '0 0 0');
+
+            orderButtons[o].setAttribute('order-button', '');
+            orderButtons[o].setAttribute('class', 'order-button');
+            orderButtons[o].setAttribute('mixin', 'order-button');
+            orderButtons[o].setAttribute('static-body', '');
           }
 
           // Generate our teleporter spots
@@ -198,6 +233,10 @@
         </a-mixin>
         <a-mixin id="cup-dragover"></a-mixin>
         <a-mixin id="teleporter" geometry="primitive: sphere; radius: 0.5;" material="color: #fff; opacity: 0.5" sphere-collider="objects: .avatar, .head, .avatar-camera"></a-mixin>
+        <a-mixin id="order-button" geometry="primitive: box; width: 0.2; height: 0.05; depth: 0.2" material="color: #f0f;">
+        </a-mixin>
+        <a-mixin id="order-button-toggle" geometry="primitive: box; width: 0.18; height: 0.06; depth: 0.18" material="color: #0f0;">
+        </a-mixin>
         
         <audio id="audio-success" src="/audio/success.mp3" preload="auto"></audio>
         <audio id="audio-fail" src="/audio/fail.mp3" preload="auto"></audio>
@@ -207,6 +246,11 @@
         <!-- Templates -->
         <script id="cup-template" type="text/html">
           <a-entity>
+          </a-entity>
+        </script>
+
+        <script id="order-button-template" type="text/html">
+          <a-entity class="order-button-toggle clickable" order-button-toggle mixin="order-button-toggle" position="0 0.02 0">
           </a-entity>
         </script>
 
